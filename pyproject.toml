@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xlsx-gantt"
+version = "0.1.0"
+description = "Generate richly styled Gantt charts as Excel (.xlsx) files"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+    "openpyxl>=3.1.0",
+]
+
+[project.optional-dependencies]
+# Enables non-PNG logo formats (JPEG, BMP, GIF, TIFF)
+logo = ["Pillow>=10.0.0"]
+dev  = ["pytest>=7.0"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["xlsx_gantt*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_default_fixture_loop_scope = "function"
