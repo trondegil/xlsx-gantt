@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="icon.png" alt="excel-gantt icon" width="96"/>
+  <img src="https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/icon.png" alt="xlsx-gantt icon" width="96"/>
 </p>
 
 <h1 align="center">xlsx-gantt</h1>
@@ -18,52 +18,19 @@
 </p>
 
 <p align="center">
-  <img src="screenshot.png" alt="xlsx-gantt screenshot" width="100%"/>
+  <img src="https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/screenshot.png" alt="xlsx-gantt screenshot" width="100%"/>
 </p>
 
 ---
 
 ## Features
 
-- **Zero extra dependencies** — built entirely on [openpyxl](https://openpyxl.readthedocs.io/); no pandas, no matplotlib, no Java bridge
-- **In-memory output** — `generate_excel_bytes()` returns raw `.xlsx` bytes without touching the file system; drop it straight into a Flask/Django response, e-mail it, or cache it in Redis
-- **Eight production-ready themes** — choose `ocean`, `midnight`, `forest`, `crimson`, `amber`, `slate`, `royal_purple`, or `teal`; or generate a perfectly-matched palette from any hex colour with `GanttTheme.from_color("#2E86C1")`
-- **Typed dataclass API** — `Section`, `Task`, and `DateRange` dataclasses give you IDE auto-completion and type checking; plain dicts still work and can be freely mixed in the same list
-- **Multi-section layout** — group tasks under labelled activities; section names merge vertically across their rows for a clean, structured look
-- **Multiple bars per row** — paint several independent date ranges on a single task row, each with its own hex colour
-- **Milestones** — any range where `start == end` automatically renders as a single filled cell
-- **Solid progress DataBars** — solid (gradient-free) Excel 2010 DataBar conditional formatting showing 0–100 % completion per task
-- **Resource / annotation columns** — per-task `R: Responsible` / `S: Support` markers with individually configurable background colours
-- **Time-estimate totals** — numeric estimates accumulated automatically in a styled "Total" footer row
-- **Logo embedding** — place a PNG or JPEG logo in the header area (A1:B2); scale and pixel-offset are fully configurable
-- **Freeze panes & auto-filter** — header rows and task-name columns stay fixed while scrolling; Excel dropdown filters on every label column
-- **Colour utilities included** — `darken`, `lighten`, `rotate_hue`, and `contrast_text` (WCAG 2.1) are exported for use in your own theme logic
-- **Production-safe error handling** — malformed sections, tasks, ranges, and annotations are silently skipped; no unhandled exceptions in live environments
-
----
-
-## Project Structure
-
-```
-xlsx-gantt/
-├── xlsx_gantt/                # Library package
-│   ├── __init__.py            # Public re-exports
-│   ├── style.py               # GanttStyle configuration dataclass
-│   ├── models.py              # Section, Task, DateRange input dataclasses
-│   ├── chart.py               # GanttChart builder
-│   ├── themes.py              # GanttTheme + colour utilities
-│   └── _xlsx_patch.py         # Internal: solid DataBar XML post-processor
-├── tests/
-│   ├── __init__.py
-│   ├── test_malformed_input.py
-│   ├── test_new_features.py
-│   └── test_readme_example.py
-├── pyproject.toml
-├── requirements.txt
-├── requirements-dev.txt
-├── LICENSE
-└── README.md
-```
+- **Polished charts out of the box** — pick one of eight ready-made colour themes, or generate a matching palette from your brand colour
+- **No Excel needed to create them** — charts are plain `.xlsx` files anyone can open, filter, and edit in Excel
+- **Simple to use** — describe your project as sections and tasks, get a presentation-ready chart; even directly from the command line: `xlsx-gantt chart.json -o gantt.xlsx`
+- **Shows what matters** — progress bars per task, milestones, who's responsible for what, and automatic time-estimate totals
+- **Your language, your logo** — day and week labels are fully configurable, and your logo can sit in the chart header
+- **Lightweight** — just [openpyxl](https://openpyxl.readthedocs.io/) and [Pillow](https://pypi.org/project/Pillow/); no pandas, no matplotlib, no Java bridge
 
 ---
 
@@ -73,11 +40,8 @@ xlsx-gantt/
 pip install xlsx-gantt
 ```
 
-**With optional Pillow** (enables non-PNG logo formats — JPEG, BMP, GIF, TIFF):
-
-```bash
-pip install "xlsx-gantt[logo]"
-```
+This includes everything — all logo image formats (PNG, JPEG, BMP, GIF, TIFF)
+work out of the box.
 
 ### Development install
 
@@ -177,6 +141,22 @@ xlsx_bytes = chart.generate_excel_bytes()
 print("Done!")
 ```
 
+### From a JSON file
+
+Keep the project plan in a JSON file instead of Python code and load it in
+one line:
+
+```python
+from xlsx_gantt import GanttChart, GanttTheme
+
+chart = GanttChart.from_json("chart.json", style=GanttTheme.get("ocean"))
+chart.generate_excel("gantt.xlsx")
+```
+
+The JSON mirrors the dict API, with dates as ISO strings — see
+[Command-Line Usage](#command-line-usage) for a full example file. The same
+file also works without any Python at all: `xlsx-gantt chart.json -o gantt.xlsx`.
+
 ---
 
 ## Typed Dataclass API (optional)
@@ -272,6 +252,54 @@ response["Content-Disposition"] = 'attachment; filename="gantt.xlsx"'
 
 ---
 
+## Command-Line Usage
+
+Installing the package also installs an `xlsx-gantt` command that builds a
+chart from a JSON file — no Python required:
+
+```bash
+xlsx-gantt chart.json -o gantt.xlsx --theme ocean [--logo logo.png]
+```
+
+The JSON mirrors the dict API, with dates as ISO strings (`YYYY-MM-DD`):
+
+```json
+{
+  "project_name": "Website Redesign",
+  "start_date": "2026-03-02",
+  "end_date": "2026-04-12",
+  "resource_names": ["Alice", "Bob"],
+  "sections": [
+    {
+      "name": "Design",
+      "tasks": [
+        {
+          "name": "Research",
+          "time_estimate": 3,
+          "progress": 80,
+          "ranges": [
+            {"start": "2026-03-02", "end": "2026-03-06", "color": "0070C0"}
+          ],
+          "annotations": {"Alice": "R", "Bob": "S"}
+        }
+      ]
+    }
+  ]
+}
+```
+
+`--theme` accepts any name from the [Themes](#themes) table. Invalid input is
+reported on stderr with exit code 1.
+
+The CLI is a thin wrapper around `GanttChart.from_json()`, so the same JSON
+file can be loaded from Python too:
+
+```python
+chart = GanttChart.from_json("chart.json")
+```
+
+---
+
 ## Data Structure
 
 ### Sections (dict form)
@@ -356,7 +384,7 @@ style = GanttStyle(
     bar_color        = "E74C3C",
     row_bg_even      = "F2F3F4",
     section_name_bg  = "D5D8DC",
-    annotation_a_bg  = "C8FFCC",   # green tint for "R: Responsible"
+    annotation_r_bg  = "C8FFCC",   # green tint for "R: Responsible"
     annotation_s_bg  = "FFE4B5",   # amber tint for "S: Support"
     col_label_bg     = "FFC000",
     col_label_fg     = "000000",
@@ -378,9 +406,11 @@ chart = GanttChart(sections=..., style=style, ...)
 | `row_bg_odd` | `None` | Odd data-row background (`None` = white) |
 | `section_name_bg` | `None` | First row of each section |
 | `col_label_bg` | `"FFC000"` | Row 3 — Activity / Task / date numbers |
-| `annotation_a_bg` | `None` | Background for "R" annotation cells |
+| `annotation_r_bg` | `None` | Background for "R" annotation cells (`annotation_a_bg` still accepted) |
 | `annotation_s_bg` | `None` | Background for "S" annotation cells |
 | `total_row_bg` | `None` | Total row background (`None` → `header_bg`) |
+| `day_names` | `("Mon", …, "Sun")` | Day abbreviations for row 2 (Mon-first) — set your own for other locales |
+| `week_label_format` | `"Week {week}"` | Row-1 week band label; `{week}` and `{year}` placeholders |
 | `logo_scale` | `0.7` | Logo size as a fraction of the A1:B2 area |
 | `font_name` | `"Calibri"` | Font used throughout the sheet |
 | `col_width_task` | `25.0` | Task column width (Excel units) |
@@ -410,6 +440,48 @@ comp = rotate_hue("1A5276", 180)
 
 ---
 
+## For Power Users
+
+- **In-memory output** — `generate_excel_bytes()` returns raw `.xlsx` bytes without touching the file system; drop it straight into a Flask/Django response, e-mail it, or cache it in Redis
+- **Theme engine** — `GanttTheme.from_color("#2E86C1")` derives a complete WCAG-contrast-checked palette from any hex colour; the colour helpers `darken`, `lighten`, `rotate_hue`, and `contrast_text` are exported for your own theme logic
+- **Typed dataclass API** — `Section`, `Task`, and `DateRange` dataclasses give you IDE auto-completion and type checking; plain dicts still work and can be freely mixed in the same list
+- **Multiple bars per row** — paint several independent date ranges on a single task row, each with its own hex colour; any range where `start == end` renders as a milestone
+- **Solid progress DataBars** — gradient-free Excel 2010 DataBar conditional formatting, injected via `x14` extension XML post-processing
+- **Fine-grained styling** — every colour, font, column width, and row height is a `GanttStyle` field; section names merge vertically, headers freeze, and label columns get auto-filters
+- **Locale control** — `GanttStyle.day_names` and `week_label_format` (with `{week}`/`{year}` placeholders) replace the default English labels
+- **Production-safe error handling** — malformed sections, tasks, ranges, and annotations are silently skipped; no unhandled exceptions in live environments
+
+---
+
+## Project Structure
+
+```
+xlsx-gantt/
+├── xlsx_gantt/                # Library package
+│   ├── __init__.py            # Public re-exports
+│   ├── style.py               # GanttStyle configuration dataclass
+│   ├── models.py              # Section, Task, DateRange input dataclasses
+│   ├── chart.py               # GanttChart builder
+│   ├── themes.py              # GanttTheme + colour utilities
+│   ├── cli.py                 # xlsx-gantt command-line interface
+│   ├── py.typed               # PEP 561 marker
+│   └── _xlsx_patch.py         # Internal: solid DataBar XML post-processor
+├── tests/
+│   ├── __init__.py
+│   ├── test_malformed_input.py
+│   ├── test_new_features.py
+│   ├── test_readme_example.py
+│   └── test_v020.py
+├── pyproject.toml
+├── requirements.txt
+├── requirements-dev.txt
+├── CHANGELOG.md
+├── LICENSE
+└── README.md
+```
+
+---
+
 ## Running the Tests
 
 ```bash
@@ -434,7 +506,7 @@ The test suite covers:
 |---------|---------|-------|
 | Python | ≥ 3.10 | |
 | [openpyxl](https://pypi.org/project/openpyxl/) | ≥ 3.1.0 | Required |
-| [Pillow](https://pypi.org/project/Pillow/) | ≥ 10.0.0 | Optional — non-PNG logo formats |
+| [Pillow](https://pypi.org/project/Pillow/) | ≥ 10.0.0 | Required |
 
 ---
 
@@ -488,4 +560,4 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 
 > **Dependency licences**
 > - [openpyxl](https://pypi.org/project/openpyxl/) — MIT
-> - [Pillow](https://pypi.org/project/Pillow/) (optional) — HPND (historically permissive, MIT-compatible)
+> - [Pillow](https://pypi.org/project/Pillow/) — HPND (historically permissive, MIT-compatible)

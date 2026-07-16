@@ -37,7 +37,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime
 
-
 # ══════════════════════════════════════════════════════════════════════
 # DateRange
 # ══════════════════════════════════════════════════════════════════════
@@ -72,7 +71,7 @@ class DateRange:
         return d
 
     @classmethod
-    def from_dict(cls, data: object) -> "DateRange | None":
+    def from_dict(cls, data: object) -> DateRange | None:
         """
         Construct from a raw dict.  Returns ``None`` for any non-dict
         input (the chart renderer will skip it gracefully).
@@ -136,7 +135,7 @@ class Task:
         }
 
     @classmethod
-    def from_dict(cls, data: object) -> "Task | None":
+    def from_dict(cls, data: object) -> Task | None:
         """
         Construct from a raw dict.  Returns ``None`` for any non-dict
         input so the chart renderer can skip it gracefully.
@@ -146,7 +145,7 @@ class Task:
         raw_ranges = data.get("ranges") or []
         if not isinstance(raw_ranges, list):
             raw_ranges = []
-        ranges = [r for r in raw_ranges]   # keep as-is; renderer handles guards
+        ranges = list(raw_ranges)   # keep as-is; renderer handles guards
         return cls(
             name          = data.get("name", ""),
             time_estimate = data.get("time_estimate"),
@@ -190,7 +189,7 @@ class Section:
         }
 
     @classmethod
-    def from_dict(cls, data: object) -> "Section | None":
+    def from_dict(cls, data: object) -> Section | None:
         """
         Construct from a raw dict.  Returns ``None`` for non-dict input.
         """

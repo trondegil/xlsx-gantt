@@ -10,15 +10,10 @@ to match.
 """
 from __future__ import annotations
 
-import os
-import tempfile
 import zipfile
 from datetime import datetime
 
-import pytest
-
 from xlsx_gantt import GanttChart, GanttTheme
-
 
 # ── README Quick Start data ───────────────────────────────────────────────────
 

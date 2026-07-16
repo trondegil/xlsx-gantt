@@ -10,9 +10,9 @@ leading ``#`` and normalises it internally.
 from __future__ import annotations
 
 import colorsys
+from collections.abc import Callable
 
 from .style import GanttStyle
-
 
 # ══════════════════════════════════════════════════════════════════════
 # Low-level color helpers
@@ -75,9 +75,9 @@ def rotate_hue(hex6: str, degrees: float) -> str:
     its original lightness and saturation.
     """
     r, g, b = _parse(hex6.lstrip("#"))
-    h, l, s = colorsys.rgb_to_hls(r, g, b)
+    h, lit, s = colorsys.rgb_to_hls(r, g, b)
     h = (h + degrees / 360.0) % 1.0
-    return _fmt(*colorsys.hls_to_rgb(h, l, s))
+    return _fmt(*colorsys.hls_to_rgb(h, lit, s))
 
 
 def _vivid_mid(hex6: str) -> str:
@@ -136,8 +136,8 @@ class GanttTheme:
           text auto-chosen for WCAG contrast (white on dark, black on light).
         * **Column-label & Total rows**: background = *base* darkened 88 %
           toward black; text auto-chosen (almost always white).
-        * **Even data rows**: very pale tint (88 % toward white).
-        * **Section-header rows**: light tint (72 % toward white).
+        * **Info columns** (Time Est. / Progress): very pale tint
+          (88 % toward white).
         * **Default bar fill**: vivid mid-tone at the same hue as *base*.
         * **Progress data-bar**: *base* darkened 25 % — keeps it readable.
         * Weekend & border colours are neutral (``EFEFEF`` / ``CCCCCC``).
@@ -152,8 +152,7 @@ class GanttTheme:
         hdr_fg   = contrast_text(base)        # white or black on header
         dark_bg  = darken(base, 0.88)         # near-black tinted shade
         dark_fg  = contrast_text(dark_bg)     # almost always white
-        even_bg  = lighten(base, 0.88)        # very pale even-row tint
-        sec_bg   = lighten(base, 0.72)        # light section-header tint
+        even_bg  = lighten(base, 0.88)        # very pale info-column tint
         bar      = _vivid_mid(base)           # vivid same-hue bar default
         prog_bar = lighten(base, 0.45)        # lighter progress bar tint
 
@@ -251,7 +250,7 @@ class GanttTheme:
 
     #: Mapping of lower-case theme names → factory callables.
     #: Populated below after the class body is complete.
-    _REGISTRY: dict[str, staticmethod] = {}
+    _REGISTRY: dict[str, Callable[[], GanttStyle]] = {}
 
     @classmethod
     def get(cls, name: str) -> GanttStyle:

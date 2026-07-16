@@ -10,6 +10,7 @@ primary-palette value at render time — see the field docstrings.
 from __future__ import annotations
 
 from dataclasses import dataclass
+
 from openpyxl.styles import PatternFill
 
 
@@ -31,7 +32,7 @@ class GanttStyle:
             bar_color        = "E74C3C",
             row_bg_even      = "F8F8FF",
             section_name_bg  = "D0D0FF",
-            annotation_a_bg  = "C8FFCC",
+            annotation_r_bg  = "C8FFCC",
             annotation_s_bg  = "FFE4B5",
             # ── Row 3 (column-label + date-number row) ──
             col_label_bg     = "FFC000",   # amber background for the label/date row
@@ -79,17 +80,27 @@ class GanttStyle:
     total_row_bg: str | None = None     # total-row background (→ header_bg)
     total_row_fg: str | None = None     # total-row text colour  (→ header_fg)
 
-    # ── Annotation (A/S role) cells ───────────────────────────────────
-    annotation_a_fg:  str        = "000000" # "R: Responsible" text
+    # ── Annotation (R/S role) cells ───────────────────────────────────
+    annotation_r_fg:  str        = "000000" # "R: Responsible" text
     annotation_s_fg:  str        = "000000" # "S: Support" text
-    annotation_a_bg:  str | None = None     # "A" cell background (None = default)
+    annotation_r_bg:  str | None = None     # "R" cell background (None = default)
     annotation_s_bg:  str | None = None     # "S" cell background (None = default)
     annotation_default_fg: str   = "000000" # any other role text
+    # Deprecated pre-0.2 aliases for the "R" role fields; if set, they
+    # override annotation_r_fg / annotation_r_bg (see __post_init__).
+    annotation_a_fg:  str | None = None
+    annotation_a_bg:  str | None = None
 
     # ── Logo ──────────────────────────────────────────────────────────
     logo_scale:       float = 0.7   # fraction of the A1:B2 area (0–1)
     logo_offset_x:    int   = 4     # horizontal offset in pixels from cell A1
     logo_offset_y:    int   = 4     # vertical offset in pixels from cell A1
+
+    # ── Locale / labels ───────────────────────────────────────────────
+    day_names: tuple[str, ...] = (          # Mon-first day abbreviations (row 2)
+        "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun",
+    )
+    week_label_format: str = "Week {week}"  # row-1 band label; {week} and {year} available
 
     # ── Font ──────────────────────────────────────────────────────────
     font_name:        str   = "Calibri"
@@ -114,6 +125,13 @@ class GanttStyle:
     row_height_hdr3:  float = 13.0  # Row 3 – column labels + date numbers
     row_height_data:  float = 14.0  # Data rows
     row_height_total: float = 16.0  # Total row
+
+    def __post_init__(self) -> None:
+        # Honour the deprecated annotation_a_* names when given.
+        if self.annotation_a_fg is not None:
+            self.annotation_r_fg = self.annotation_a_fg
+        if self.annotation_a_bg is not None:
+            self.annotation_r_bg = self.annotation_a_bg
 
     # ── Internal helpers ──────────────────────────────────────────────
     def _r(self, value: str | None, fallback: str) -> str:

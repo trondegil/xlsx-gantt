@@ -15,12 +15,8 @@ import io
 import zipfile
 from datetime import datetime
 
-import pytest
-
-from xlsx_gantt import GanttChart, GanttStyle, GanttTheme
-from xlsx_gantt import DateRange, Section, Task
+from xlsx_gantt import DateRange, GanttChart, GanttStyle, GanttTheme, Section, Task
 from xlsx_gantt._xlsx_patch import patch_solid_databars
-
 
 # ── Shared fixtures ───────────────────────────────────────────────────────────
 

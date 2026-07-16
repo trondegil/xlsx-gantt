@@ -17,8 +17,6 @@ import os
 import tempfile
 from datetime import datetime
 
-import pytest
-
 from xlsx_gantt import GanttChart
 
 # ── Shared fixtures ──────────────────────────────────────────────────────────

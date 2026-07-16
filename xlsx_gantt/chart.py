@@ -13,12 +13,14 @@ borders — lives in its own method rather than one monolithic function.
 """
 from __future__ import annotations
 
+import json
 import os
+import warnings
 from collections import OrderedDict
+from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import timedelta
+from datetime import date, timedelta
 from io import BytesIO
-from typing import Callable
 
 from openpyxl import Workbook
 from openpyxl.drawing.image import Image as XLImage
@@ -30,9 +32,8 @@ from openpyxl.utils import get_column_letter
 from openpyxl.utils.units import pixels_to_EMU
 
 from ._xlsx_patch import patch_solid_databars
-from .models import DateRange, Section, Task
+from .models import Section, Task
 from .style import GanttStyle
-
 
 # ══════════════════════════════════════════════════════════════════════
 # Private rendering context
@@ -96,6 +97,44 @@ class _RenderCtx:
 
 
 # ══════════════════════════════════════════════════════════════════════
+# JSON loading helpers (used by GanttChart.from_json and the CLI)
+# ══════════════════════════════════════════════════════════════════════
+
+def _parse_iso_date(value: object, field: str) -> date:
+    if not isinstance(value, str):
+        raise ValueError(f"'{field}' must be an ISO date string (YYYY-MM-DD)")
+    try:
+        return date.fromisoformat(value)
+    except ValueError:
+        raise ValueError(
+            f"'{field}': invalid ISO date {value!r} (expected YYYY-MM-DD)"
+        ) from None
+
+
+def _convert_range_dates(sections: list) -> list:
+    """Parse ISO date strings inside every task range, in place."""
+    for section in sections:
+        if not isinstance(section, dict):
+            continue
+        tasks = section.get("tasks")
+        if not isinstance(tasks, list):
+            continue
+        for task in tasks:
+            if not isinstance(task, dict):
+                continue
+            ranges = task.get("ranges")
+            if not isinstance(ranges, list):
+                continue
+            for rng in ranges:
+                if not isinstance(rng, dict):
+                    continue
+                for key in ("start", "end"):
+                    if isinstance(rng.get(key), str):
+                        rng[key] = _parse_iso_date(rng[key], f"ranges.{key}")
+    return sections
+
+
+# ══════════════════════════════════════════════════════════════════════
 # GanttChart
 # ══════════════════════════════════════════════════════════════════════
 
@@ -141,7 +180,7 @@ class GanttChart:
     project_name   : str
     resource_names : list[str]   — annotation column headers
     style          : GanttStyle  — visual configuration (uses defaults if omitted)
-    logo_path      : str | None  — path to a logo image (PNG recommended)
+    logo_path      : str | None  — path to a logo image (PNG, JPEG, BMP, GIF, TIFF)
     """
 
     def __init__(
@@ -150,8 +189,8 @@ class GanttChart:
         start_date,
         end_date,
         project_name:   str        = "Project Name",
-        resource_names: list[str]  = None,
-        style:          GanttStyle = None,
+        resource_names: list[str] | None  = None,
+        style:          GanttStyle | None = None,
         logo_path:      str | None = None,
     ):
         self.sections       = sections if sections is not None else []
@@ -199,6 +238,74 @@ class GanttChart:
             )
         """
         return self._render().getvalue()
+
+    @classmethod
+    def from_json(
+        cls,
+        path: str,
+        *,
+        style: GanttStyle | None = None,
+        logo_path: str | None = None,
+    ) -> GanttChart:
+        """
+        Build a :class:`GanttChart` directly from a JSON file.
+
+        The JSON document mirrors the dict API, with dates as ISO strings
+        (``YYYY-MM-DD``)::
+
+            {
+              "project_name": "Website Redesign",
+              "start_date": "2026-03-02",
+              "end_date": "2026-04-12",
+              "resource_names": ["Alice", "Bob"],
+              "sections": [
+                {
+                  "name": "Design",
+                  "tasks": [
+                    {
+                      "name": "Research",
+                      "time_estimate": 3,
+                      "progress": 80,
+                      "ranges": [
+                        {"start": "2026-03-02", "end": "2026-03-06",
+                         "color": "0070C0"}
+                      ],
+                      "annotations": {"Alice": "R", "Bob": "S"}
+                    }
+                  ]
+                }
+              ]
+            }
+
+        Usage::
+
+            chart = GanttChart.from_json("chart.json")
+            chart.generate_excel("gantt.xlsx")
+
+        Raises :class:`ValueError` for invalid JSON or missing/malformed
+        keys, and :class:`OSError` if the file cannot be read.
+        """
+        with open(path, encoding="utf-8") as fh:
+            try:
+                data = json.load(fh)
+            except json.JSONDecodeError as err:
+                raise ValueError(f"'{path}' is not valid JSON: {err}") from None
+        if not isinstance(data, dict):
+            raise ValueError(f"'{path}' must contain a JSON object")
+        for required in ("start_date", "end_date", "sections"):
+            if required not in data:
+                raise ValueError(f"'{path}' is missing required key '{required}'")
+        if not isinstance(data["sections"], list):
+            raise ValueError("'sections' must be a list")
+        return cls(
+            sections       = _convert_range_dates(data["sections"]),
+            start_date     = _parse_iso_date(data["start_date"], "start_date"),
+            end_date       = _parse_iso_date(data["end_date"], "end_date"),
+            project_name   = data.get("project_name", "Project Name"),
+            resource_names = data.get("resource_names") or [],
+            style          = style,
+            logo_path      = logo_path,
+        )
 
     # ══════════════════════════════════════════════════════════════════
     # Core render pipeline
@@ -346,7 +453,8 @@ class GanttChart:
                     tasks = []
             else:
                 continue
-            total_tasks += len(tasks)
+            # Count only entries _write_data_rows will actually render
+            total_tasks += sum(1 for t in tasks if isinstance(t, (Task, dict)))
         return 3 + total_tasks + 1
 
     def _setup_dimensions(self, ws, ctx: _RenderCtx) -> None:
@@ -423,7 +531,10 @@ class GanttChart:
             logo_img.anchor = OneCellAnchor(_from=marker, ext=size)
             ws.add_image(logo_img)
         except Exception as err:
-            print(f"Warning: could not insert logo '{self.logo_path}': {err}")
+            warnings.warn(
+                f"Could not insert logo '{self.logo_path}': {err}",
+                stacklevel=2,
+            )
 
     def _write_title(self, ws, ctx: _RenderCtx) -> None:
         """Write the project title into merged cells C1:D2."""
@@ -466,19 +577,19 @@ class GanttChart:
             else:
                 week_groups[key][1] = ctx.DATE_COL0 + i
 
-        for _key, (sc, ec, wnum) in week_groups.items():
+        for (year, _), (sc, ec, wnum) in week_groups.items():
             if sc != ec:
                 ws.merge_cells(start_row=1, start_column=sc,
                                end_row=1,   end_column=ec)
             c = ws.cell(row=1, column=sc)
-            c.value     = f"Week {wnum}"
+            c.value     = ctx.s.week_label_format.format(week=wnum, year=year)
             c.font      = ctx.hdr_font(fg=ctx.week_label_fg)
             c.fill      = ctx.week_fill
             c.alignment = ctx.center
 
     def _write_day_names(self, ws, ctx: _RenderCtx) -> None:
-        """Write day-name abbreviations (Mon … Sun) in row 2."""
-        _abbr = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+        """Write day-name abbreviations (``style.day_names``, Mon-first) in row 2."""
+        _abbr = ctx.s.day_names
         for i, d in enumerate(self.dates):
             c = ws.cell(row=2, column=ctx.DATE_COL0 + i)
             c.value     = _abbr[d.weekday()]
@@ -723,9 +834,9 @@ class GanttChart:
             c.value     = role
             c.alignment = ctx.center
             if role == "R":
-                c.font = ctx.body_font(fg=s.annotation_a_fg)
-                if s.annotation_a_bg:
-                    c.fill = PatternFill("solid", fgColor=s.annotation_a_bg)
+                c.font = ctx.body_font(fg=s.annotation_r_fg)
+                if s.annotation_r_bg:
+                    c.fill = PatternFill("solid", fgColor=s.annotation_r_bg)
             elif role == "S":
                 c.font = ctx.body_font(fg=s.annotation_s_fg)
                 if s.annotation_s_bg:

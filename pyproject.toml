@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xlsx-gantt"
-version = "0.1.0"
+version = "0.2.0"
 description = "Generate richly styled Gantt charts as Excel (.xlsx) files"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -28,6 +28,7 @@ classifiers = [
 ]
 dependencies = [
     "openpyxl>=3.1.0",
+    "Pillow>=10.0.0",
 ]
 
 [project.urls]
@@ -36,14 +37,40 @@ Repository = "https://github.com/trondegil/xlsx-gantt"
 "Bug Tracker" = "https://github.com/trondegil/xlsx-gantt/issues"
 
 [project.optional-dependencies]
-# Enables non-PNG logo formats (JPEG, BMP, GIF, TIFF)
+# Deprecated no-op alias — Pillow is now a default dependency.
 logo = ["Pillow>=10.0.0"]
-dev  = ["pytest>=7.0"]
+dev  = ["pytest>=7.0", "ruff>=0.4", "mypy>=1.10"]
+
+[project.scripts]
+xlsx-gantt = "xlsx_gantt.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["xlsx_gantt*"]
 
+[tool.setuptools.package-data]
+xlsx_gantt = ["py.typed"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-asyncio_default_fixture_loop_scope = "function"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = ["E221", "E241"]  # aligned assignments/annotations are intentional style
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E501"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_unused_ignores = true
+no_implicit_optional = true
+check_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = "openpyxl.*"
+ignore_missing_imports = true
