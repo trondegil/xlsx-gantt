@@ -5,6 +5,22 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-07-27
+
+Documentation-only release; the library code is unchanged from 0.2.0.
+
+### Changed
+- README leads with a rendered chart and shows every built-in theme in a
+  gallery under the theme table.
+- README reordered for first-time readers: features, installation, quick
+  start, CLI, themes, and data structure come first, with the typed
+  dataclass API, in-memory output, custom styles, and colour utilities
+  grouped under *Advanced Usage* and the dev instructions under
+  *Development*.
+- New logo, and the screenshots are regenerated so they show it.
+
+---
+
 ## [0.2.0] - 2026-07-16
 
 ### Added

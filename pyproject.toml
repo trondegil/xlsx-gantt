@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xlsx-gantt"
-version = "0.2.0"
+version = "0.2.1"
 description = "Generate richly styled Gantt charts as Excel (.xlsx) files"
 readme = "README.md"
 requires-python = ">=3.10"
