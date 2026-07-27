@@ -19,15 +19,7 @@
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/ocean.png" alt="xlsx-gantt chart rendered with the ocean theme" width="100%"/>
-</p>
-
-<p align="center">
-  <em>Eight built-in themes — the same chart, one line of code apart:</em>
-</p>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/gallery.png" alt="All eight built-in xlsx-gantt themes" width="100%"/>
+  <img src="https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/hero.png" alt="xlsx-gantt chart rendered with the midnight theme" width="100%"/>
 </p>
 
 ---
@@ -231,6 +223,12 @@ Eight built-in themes are available:
 | `midnight` | Modern near-black | `1B2631` |
 | `teal` | Fresh blue-green | `148F77` |
 
+The same chart in every theme, in the order listed above:
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/gallery.png" alt="All eight built-in xlsx-gantt themes" width="100%"/>
+</p>
+
 ```python
 from xlsx_gantt import GanttTheme
 
@@ -246,8 +244,6 @@ style = GanttTheme.from_color("#2E86C1")
 # List all available theme names
 print(GanttTheme.list_themes())
 ```
-
-Every theme is rendered in the [gallery](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/gallery.png) at the top of this page.
 
 ---
 
