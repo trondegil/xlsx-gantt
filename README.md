@@ -247,41 +247,7 @@ style = GanttTheme.from_color("#2E86C1")
 print(GanttTheme.list_themes())
 ```
 
-### Gallery
-
-The same chart rendered with each built-in theme:
-
-**`amber`**
-
-![amber theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/amber.png)
-
-**`ocean`**
-
-![ocean theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/ocean.png)
-
-**`forest`**
-
-![forest theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/forest.png)
-
-**`crimson`**
-
-![crimson theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/crimson.png)
-
-**`slate`**
-
-![slate theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/slate.png)
-
-**`royal_purple`**
-
-![royal_purple theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/royal_purple.png)
-
-**`midnight`**
-
-![midnight theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/midnight.png)
-
-**`teal`**
-
-![teal theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/teal.png)
+Every theme is rendered in the [gallery](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/gallery.png) at the top of this page.
 
 ---
 
