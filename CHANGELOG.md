@@ -5,6 +5,17 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.3] - 2026-07-27
+
+### Changed
+- Trove classifier moved from `Development Status :: 3 - Alpha` to
+  `4 - Beta`: the feature set is complete for the documented scope, the
+  public API has been stable across 0.2.x (the one rename in 0.2.0 kept
+  deprecated aliases), and the suite runs 115 tests with ruff and mypy
+  clean in CI.
+
+---
+
 ## [0.2.2] - 2026-07-27
 
 Documentation-only release; the library code is unchanged from 0.2.0.
