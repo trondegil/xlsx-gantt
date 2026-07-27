@@ -5,8 +5,6 @@
   </picture>
 </p>
 
-<h1 align="center">xlsx-gantt</h1>
-
 <p align="center">
   <a href="https://pypi.org/project/xlsx-gantt/"><img src="https://img.shields.io/pypi/v/xlsx-gantt?color=blue" alt="PyPI version"/></a>
   <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10%2B-blue?logo=python&logoColor=white" alt="Python 3.10+"/></a>
