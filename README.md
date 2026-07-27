@@ -19,7 +19,15 @@
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/screenshot.png" alt="xlsx-gantt screenshot" width="100%"/>
+  <img src="https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/ocean.png" alt="xlsx-gantt chart rendered with the ocean theme" width="100%"/>
+</p>
+
+<p align="center">
+  <em>Eight built-in themes — the same chart, one line of code apart:</em>
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/gallery.png" alt="All eight built-in xlsx-gantt themes" width="100%"/>
 </p>
 
 ---
