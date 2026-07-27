@@ -39,6 +39,7 @@
 - **Simple to use** — describe your project as sections and tasks, get a presentation-ready chart; even directly from the command line: `xlsx-gantt chart.json -o gantt.xlsx`
 - **Shows what matters** — progress bars per task, milestones, who's responsible for what, and automatic time-estimate totals
 - **Your language, your logo** — day and week labels are fully configurable, and your logo can sit in the chart header
+- **A natural fit for AI-assisted planning** — the whole plan is plain dicts or a JSON file, so an LLM or coding agent can draft it, revise it, and regenerate the chart in one step; describe the project in prose, let the model produce the JSON, and run `xlsx-gantt plan.json -o gantt.xlsx`
 - **Lightweight** — just [openpyxl](https://openpyxl.readthedocs.io/) and [Pillow](https://pypi.org/project/Pillow/); no pandas, no matplotlib, no Java bridge
 
 ---
