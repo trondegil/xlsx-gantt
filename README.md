@@ -32,6 +32,14 @@
 
 ---
 
+## Contents
+
+**Getting started:** [Features](#features) · [Installation](#installation) · [Quick Start](#quick-start) · [Command-Line Usage](#command-line-usage) · [Themes](#themes) · [Data Structure](#data-structure)
+
+**Going further:** [Advanced Usage](#advanced-usage) · [Development](#development) · [Requirements](#requirements) · [Contributing](#contributing) · [License](#license)
+
+---
+
 ## Features
 
 - **Polished charts out of the box** — pick one of eight ready-made colour themes, or generate a matching palette from your brand colour
@@ -51,14 +59,6 @@ pip install xlsx-gantt
 
 This includes everything — all logo image formats (PNG, JPEG, BMP, GIF, TIFF)
 work out of the box.
-
-### Development install
-
-```bash
-git clone https://github.com/trondegil/xlsx-gantt.git
-cd xlsx-gantt
-pip install -e ".[dev]"
-```
 
 ---
 
@@ -168,7 +168,166 @@ file also works without any Python at all: `xlsx-gantt chart.json -o gantt.xlsx`
 
 ---
 
-## Typed Dataclass API (optional)
+## Command-Line Usage
+
+Installing the package also installs an `xlsx-gantt` command that builds a
+chart from a JSON file — no Python required:
+
+```bash
+xlsx-gantt chart.json -o gantt.xlsx --theme ocean [--logo logo.png]
+```
+
+The JSON mirrors the dict API, with dates as ISO strings (`YYYY-MM-DD`):
+
+```json
+{
+  "project_name": "Website Redesign",
+  "start_date": "2026-03-02",
+  "end_date": "2026-04-12",
+  "resource_names": ["Alice", "Bob"],
+  "sections": [
+    {
+      "name": "Design",
+      "tasks": [
+        {
+          "name": "Research",
+          "time_estimate": 3,
+          "progress": 80,
+          "ranges": [
+            {"start": "2026-03-02", "end": "2026-03-06", "color": "0070C0"}
+          ],
+          "annotations": {"Alice": "R", "Bob": "S"}
+        }
+      ]
+    }
+  ]
+}
+```
+
+`--theme` accepts any name from the [Themes](#themes) table. Invalid input is
+reported on stderr with exit code 1.
+
+The CLI is a thin wrapper around `GanttChart.from_json()`, so the same JSON
+file can be loaded from Python too:
+
+```python
+chart = GanttChart.from_json("chart.json")
+```
+
+---
+
+## Themes
+
+Eight built-in themes are available:
+
+| Name | Description | Base colour |
+|------|-------------|-------------|
+| `amber` | Warm corporate orange | `FFC000` |
+| `ocean` | Deep professional blue | `1A5276` |
+| `forest` | Environmental green | `1E8449` |
+| `crimson` | Bold, high-impact red | `922B21` |
+| `slate` | Minimal neutral gray | `5D6D7E` |
+| `royal_purple` | Original default palette | `7030A0` |
+| `midnight` | Modern near-black | `1B2631` |
+| `teal` | Fresh blue-green | `148F77` |
+
+```python
+from xlsx_gantt import GanttTheme
+
+# By static method
+style = GanttTheme.ocean()
+
+# By name (case-insensitive; spaces and hyphens treated as underscores)
+style = GanttTheme.get("royal_purple")
+
+# Generated from any base hex colour
+style = GanttTheme.from_color("#2E86C1")
+
+# List all available theme names
+print(GanttTheme.list_themes())
+```
+
+### Gallery
+
+The same chart rendered with each built-in theme:
+
+**`amber`**
+
+![amber theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/amber.png)
+
+**`ocean`**
+
+![ocean theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/ocean.png)
+
+**`forest`**
+
+![forest theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/forest.png)
+
+**`crimson`**
+
+![crimson theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/crimson.png)
+
+**`slate`**
+
+![slate theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/slate.png)
+
+**`royal_purple`**
+
+![royal_purple theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/royal_purple.png)
+
+**`midnight`**
+
+![midnight theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/midnight.png)
+
+**`teal`**
+
+![teal theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/teal.png)
+
+---
+
+## Data Structure
+
+### Sections (dict form)
+
+```python
+{
+    "name": str,       # section label (merged across all its task rows in column A)
+    "tasks": [ ... ]   # list of task dicts (see below)
+}
+```
+
+### Tasks (dict form)
+
+```python
+{
+    "name": str,                      # task label
+    "time_estimate": float | None,    # hours / days / any unit; summed in the Total row
+    "progress": float | None,         # 0–100 %; rendered as a solid DataBar
+    "ranges": [                       # one or more coloured bars on the timeline
+        {
+            "start": datetime,        # inclusive start date
+            "end":   datetime,        # inclusive end date (start == end → milestone)
+            "color": "RRGGBB",        # 6-digit hex, no '#'; falls back to theme bar colour
+        },
+        ...
+    ],
+    "annotations": {                  # optional resource role markers
+        "Alice": "R",                 # R = Responsible
+        "Bob":   "S",                 # S = Support
+    },
+}
+```
+
+> **Note:** `time_estimate`, `progress`, `ranges`, and `annotations` are all optional.
+> Omitting them or passing `None` is handled gracefully.
+
+---
+
+# Advanced Usage
+
+Everything below is optional — the sections above cover the common cases.
+
+## Typed Dataclass API
 
 Instead of plain dicts you can use the typed `Section`, `Task`, and `DateRange`
 dataclasses.  Both forms are fully interchangeable and may be freely mixed in the
@@ -261,163 +420,6 @@ response["Content-Disposition"] = 'attachment; filename="gantt.xlsx"'
 
 ---
 
-## Command-Line Usage
-
-Installing the package also installs an `xlsx-gantt` command that builds a
-chart from a JSON file — no Python required:
-
-```bash
-xlsx-gantt chart.json -o gantt.xlsx --theme ocean [--logo logo.png]
-```
-
-The JSON mirrors the dict API, with dates as ISO strings (`YYYY-MM-DD`):
-
-```json
-{
-  "project_name": "Website Redesign",
-  "start_date": "2026-03-02",
-  "end_date": "2026-04-12",
-  "resource_names": ["Alice", "Bob"],
-  "sections": [
-    {
-      "name": "Design",
-      "tasks": [
-        {
-          "name": "Research",
-          "time_estimate": 3,
-          "progress": 80,
-          "ranges": [
-            {"start": "2026-03-02", "end": "2026-03-06", "color": "0070C0"}
-          ],
-          "annotations": {"Alice": "R", "Bob": "S"}
-        }
-      ]
-    }
-  ]
-}
-```
-
-`--theme` accepts any name from the [Themes](#themes) table. Invalid input is
-reported on stderr with exit code 1.
-
-The CLI is a thin wrapper around `GanttChart.from_json()`, so the same JSON
-file can be loaded from Python too:
-
-```python
-chart = GanttChart.from_json("chart.json")
-```
-
----
-
-## Data Structure
-
-### Sections (dict form)
-
-```python
-{
-    "name": str,       # section label (merged across all its task rows in column A)
-    "tasks": [ ... ]   # list of task dicts (see below)
-}
-```
-
-### Tasks (dict form)
-
-```python
-{
-    "name": str,                      # task label
-    "time_estimate": float | None,    # hours / days / any unit; summed in the Total row
-    "progress": float | None,         # 0–100 %; rendered as a solid DataBar
-    "ranges": [                       # one or more coloured bars on the timeline
-        {
-            "start": datetime,        # inclusive start date
-            "end":   datetime,        # inclusive end date (start == end → milestone)
-            "color": "RRGGBB",        # 6-digit hex, no '#'; falls back to theme bar colour
-        },
-        ...
-    ],
-    "annotations": {                  # optional resource role markers
-        "Alice": "R",                 # R = Responsible
-        "Bob":   "S",                 # S = Support
-    },
-}
-```
-
-> **Note:** `time_estimate`, `progress`, `ranges`, and `annotations` are all optional.
-> Omitting them or passing `None` is handled gracefully.
-
----
-
-## Themes
-
-Eight built-in themes are available:
-
-| Name | Description | Base colour |
-|------|-------------|-------------|
-| `amber` | Warm corporate orange | `FFC000` |
-| `ocean` | Deep professional blue | `1A5276` |
-| `forest` | Environmental green | `1E8449` |
-| `crimson` | Bold, high-impact red | `922B21` |
-| `slate` | Minimal neutral gray | `5D6D7E` |
-| `royal_purple` | Original default palette | `7030A0` |
-| `midnight` | Modern near-black | `1B2631` |
-| `teal` | Fresh blue-green | `148F77` |
-
-### Gallery
-
-The same chart rendered with each built-in theme:
-
-**`amber`**
-
-![amber theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/amber.png)
-
-**`ocean`**
-
-![ocean theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/ocean.png)
-
-**`forest`**
-
-![forest theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/forest.png)
-
-**`crimson`**
-
-![crimson theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/crimson.png)
-
-**`slate`**
-
-![slate theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/slate.png)
-
-**`royal_purple`**
-
-![royal_purple theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/royal_purple.png)
-
-**`midnight`**
-
-![midnight theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/midnight.png)
-
-**`teal`**
-
-![teal theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/teal.png)
-
-### Usage
-
-```python
-from xlsx_gantt import GanttTheme
-
-# By static method
-style = GanttTheme.ocean()
-
-# By name (case-insensitive; spaces and hyphens treated as underscores)
-style = GanttTheme.get("royal_purple")
-
-# Generated from any base hex colour
-style = GanttTheme.from_color("#2E86C1")
-
-# List all available theme names
-print(GanttTheme.list_themes())
-```
-
----
-
 ## Custom Styles
 
 Pass a `GanttStyle` dataclass instance to override any visual property:
@@ -500,6 +502,16 @@ comp = rotate_hue("1A5276", 180)
 
 ---
 
+# Development
+
+## Development install
+
+```bash
+git clone https://github.com/trondegil/xlsx-gantt.git
+cd xlsx-gantt
+pip install -e ".[dev]"
+```
+
 ## Project Structure
 
 ```
@@ -526,8 +538,6 @@ xlsx-gantt/
 ├── LICENSE
 └── README.md
 ```
-
----
 
 ## Running the Tests
 
