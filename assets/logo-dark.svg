@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1414 400" width="1414" height="400" role="img" aria-label="xlsx-gantt">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#60A5FA"/>
+      <stop offset="1" stop-color="#1D4ED8"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#34D399"/>
+      <stop offset="1" stop-color="#047857"/>
+    </linearGradient>
+    <linearGradient id="g3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FBBF24"/>
+      <stop offset="1" stop-color="#EA580C"/>
+    </linearGradient>
+
+    <filter id="soft" x="-25%" y="-40%" width="150%" height="200%">
+      <feDropShadow dx="0" dy="6" stdDeviation="9" flood-color="#0F172A" flood-opacity="0.18"/>
+    </filter>
+
+    <clipPath id="c1"><rect x="96"  y="46"  width="252" height="72" rx="18"/></clipPath>
+    <clipPath id="c2"><rect x="180" y="140" width="294" height="72" rx="18"/></clipPath>
+    <clipPath id="c3"><rect x="264" y="234" width="294" height="72" rx="18"/></clipPath>
+  </defs>
+
+  <!-- timeline axis -->
+  <g stroke="#94A3B8" stroke-opacity="0.55" stroke-width="3" stroke-linecap="round">
+    <line x1="96" y1="344" x2="600" y2="344"/>
+    <line x1="96"  y1="344" x2="96"  y2="356"/>
+    <line x1="180" y1="344" x2="180" y2="356"/>
+    <line x1="264" y1="344" x2="264" y2="356"/>
+    <line x1="348" y1="344" x2="348" y2="356"/>
+    <line x1="432" y1="344" x2="432" y2="356"/>
+    <line x1="516" y1="344" x2="516" y2="356"/>
+    <line x1="600" y1="344" x2="600" y2="356"/>
+  </g>
+
+  <!-- bars -->
+  <g filter="url(#soft)">
+    <rect x="96"  y="46"  width="252" height="72" rx="18" fill="#3B82F6" fill-opacity="0.16"/>
+    <rect x="180" y="140" width="294" height="72" rx="18" fill="#10B981" fill-opacity="0.16"/>
+    <rect x="264" y="234" width="294" height="72" rx="18" fill="#F59E0B" fill-opacity="0.16"/>
+  </g>
+  <g clip-path="url(#c1)"><rect x="96"  y="46"  width="234" height="72" fill="url(#g1)"/></g>
+  <g clip-path="url(#c2)"><rect x="180" y="140" width="150" height="72" fill="url(#g2)"/></g>
+  <g clip-path="url(#c3)"><rect x="264" y="234" width="66"  height="72" fill="url(#g3)"/></g>
+
+  <!-- gloss -->
+  <g fill="#FFFFFF" fill-opacity="0.28">
+    <rect x="110" y="56"  width="206" height="10" rx="5"/>
+    <rect x="194" y="150" width="122" height="10" rx="5"/>
+    <rect x="278" y="244" width="38"  height="10" rx="5"/>
+  </g>
+
+  <!-- today marker -->
+  <line x1="330" y1="22" x2="330" y2="344" stroke="#F8FAFC" stroke-opacity="0.45" stroke-width="4" stroke-dasharray="10 12" stroke-linecap="round"/>
+  <circle cx="330" cy="344" r="9" fill="#F8FAFC" fill-opacity="0.45"/>
+
+  <!-- wordmark -->
+  <text x="660" y="252"
+        font-family="Inter, 'SF Pro Display', -apple-system, 'Helvetica Neue', Arial, sans-serif"
+        font-size="152" font-weight="700" letter-spacing="-7" fill="#F8FAFC">xlsx-gantt</text>
+</svg>
