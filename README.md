@@ -354,6 +354,44 @@ Eight built-in themes are available:
 | `midnight` | Modern near-black | `1B2631` |
 | `teal` | Fresh blue-green | `148F77` |
 
+### Gallery
+
+The same chart rendered with each built-in theme:
+
+**`amber`**
+
+![amber theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/amber.png)
+
+**`ocean`**
+
+![ocean theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/ocean.png)
+
+**`forest`**
+
+![forest theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/forest.png)
+
+**`crimson`**
+
+![crimson theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/crimson.png)
+
+**`slate`**
+
+![slate theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/slate.png)
+
+**`royal_purple`**
+
+![royal_purple theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/royal_purple.png)
+
+**`midnight`**
+
+![midnight theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/midnight.png)
+
+**`teal`**
+
+![teal theme](https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/themes/teal.png)
+
+### Usage
+
 ```python
 from xlsx_gantt import GanttTheme
 
