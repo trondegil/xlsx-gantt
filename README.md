@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/logo-dark.png"/>
-    <img src="https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/logo.png" alt="xlsx-gantt" width="440"/>
+    <img src="https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/logo.png" alt="xlsx-gantt" width="300"/>
   </picture>
 </p>
 
