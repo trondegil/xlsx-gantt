@@ -7,7 +7,7 @@
 
 <p align="center">
   <a href="https://pypi.org/project/xlsx-gantt/"><img src="https://img.shields.io/pypi/v/xlsx-gantt?color=blue" alt="PyPI version"/></a>
-  <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10%2B-blue?logo=python&logoColor=white" alt="Python 3.10+"/></a>
+  <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.9%2B-blue?logo=python&logoColor=white" alt="Python 3.9+"/></a>
   <a href="https://github.com/trondegil/xlsx-gantt/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License"/></a>
   <a href="https://pypi.org/project/openpyxl/"><img src="https://img.shields.io/badge/openpyxl-%E2%89%A53.1-informational?logo=microsoft-excel&logoColor=white" alt="openpyxl ≥ 3.1"/></a>
   <a href="https://github.com/trondegil/xlsx-gantt"><img src="https://img.shields.io/badge/github-trondegil%2Fxlsx--gantt-181717?logo=github&logoColor=white" alt="GitHub repository"/></a>
@@ -633,7 +633,7 @@ The test suite covers:
 
 | Package | Version | Notes |
 |---------|---------|-------|
-| Python | ≥ 3.10 | |
+| Python | ≥ 3.9 | Tested on 3.9–3.14 |
 | [openpyxl](https://pypi.org/project/openpyxl/) | ≥ 3.1.0 | Required |
 | [Pillow](https://pypi.org/project/Pillow/) | ≥ 10.0.0 | Required |
 

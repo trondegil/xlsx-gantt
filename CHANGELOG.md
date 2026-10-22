@@ -5,6 +5,13 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.3] - 2026-10-22
+
+### Added
+- Python 3.9 and 3.14 support. The package now installs on Python 3.9+
+  and CI tests every version from 3.9 to 3.14. No code changes were
+  needed.
+
 ## [0.4.2] - 2026-10-22
 
 ### Added
