@@ -261,7 +261,7 @@ xlsx-gantt plan.json -o bakery.xlsx --color A0522D --logo bakery-logo.png
 ```
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/ai-planning-example.png" alt="Gantt chart for the bakery online-ordering project in the bakery's brown brand colour, with its bread logo in the corner" width="100%"/>
+  <img src="https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/ai-planning-example.png" alt="Gantt chart for the bakery online-ordering project in the bakery's brown brand colour, with its kringle logo in the corner" width="100%"/>
 </p>
 
 To change the plan, keep the conversation going ("move user testing a week
@@ -269,11 +269,13 @@ later and add a security review"), save the new JSON, and run the command
 again. Coding agents such as Claude Code can edit `plan.json` and run the CLI
 themselves.
 
-Both files are in the repository, so from a clone you can rebuild this exact
-chart:
+The plan, the logo and the finished workbook
+([`bakery-plan.xlsx`](https://github.com/trondegil/xlsx-gantt/raw/master/examples/bakery-plan.xlsx))
+are all in [`examples/`](https://github.com/trondegil/xlsx-gantt/tree/master/examples).
+From a clone you can rebuild the workbook yourself:
 
 ```bash
-xlsx-gantt examples/bakery-plan.json -o bakery.xlsx --color A0522D --logo examples/bakery-logo.png
+xlsx-gantt examples/bakery-plan.json -o bakery-plan.xlsx --color A0522D --logo examples/bakery-logo.png
 ```
 
 ---
@@ -493,7 +495,7 @@ chart = GanttChart(sections=..., style=style, ...)
 | `day_names` | `("Mon", …, "Sun")` | Day abbreviations for row 2 (Mon-first) — set your own for other locales |
 | `week_label_format` | `"Week {week}"` | Row-1 week band label; `{week}` and `{year}` placeholders |
 | `week_start` | `0` | First day of the week band: `0` = Monday … `6` = Sunday. Monday uses ISO week numbers; other days count the week containing 1 January as week 1 |
-| `logo_scale` | `0.7` | Logo size as a fraction of the A1:B2 area |
+| `logo_scale` | `1.0` | Logo size as a fraction of the A1:B2 area (the logo fills the header height by default) |
 | `font_name` | `"Calibri"` | Font used throughout the sheet |
 | `col_width_task` | `25.0` | Task column width (Excel units) |
 | `col_width_date` | `3.0` | Width of each day column |
@@ -560,7 +562,8 @@ xlsx-gantt/
 │   └── _xlsx_patch.py         # Internal: solid DataBar XML post-processor
 ├── examples/
 │   ├── bakery-logo.png        # Logo used in the README example
-│   └── bakery-plan.json       # AI-written plan from the README
+│   ├── bakery-plan.json       # AI-written plan from the README
+│   └── bakery-plan.xlsx       # The workbook built from it
 ├── tests/
 │   ├── __init__.py
 │   ├── test_malformed_input.py

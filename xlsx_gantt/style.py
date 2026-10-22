@@ -92,7 +92,7 @@ class GanttStyle:
     annotation_a_bg:  str | None = None
 
     # ── Logo ──────────────────────────────────────────────────────────
-    logo_scale:       float = 0.7   # fraction of the A1:B2 area (0–1)
+    logo_scale:       float = 1.0   # fraction of the A1:B2 area (0–1)
     logo_offset_x:    int   = 4     # horizontal offset in pixels from cell A1
     logo_offset_y:    int   = 4     # vertical offset in pixels from cell A1
 

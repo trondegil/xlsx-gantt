@@ -42,5 +42,6 @@ Thumbs.db
 
 # ── Generated output ─────────────────────────────────────────────────────────
 *.xlsx
+!examples/*.xlsx
 
 test/

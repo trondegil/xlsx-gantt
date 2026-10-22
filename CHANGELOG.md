@@ -5,6 +5,17 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- Logos are bigger: `GanttStyle.logo_scale` now defaults to `1.0`, so the
+  logo fills the height of the header rows instead of 70 % of it. Set
+  `logo_scale=0.7` to get the old size.
+- The README example's logo is now a kringle, and the finished workbook
+  is included as `examples/bakery-plan.xlsx`.
+
+---
+
 ## [0.4.0] - 2026-10-22
 
 ### Added
