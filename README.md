@@ -57,6 +57,54 @@ work out of the box.
 
 ## Quick Start
 
+Describe the project plan in a JSON file, say `chart.json`. Dates are ISO
+strings (`YYYY-MM-DD`):
+
+```json
+{
+  "project_name": "Website Redesign",
+  "start_date": "2026-03-02",
+  "end_date": "2026-04-12",
+  "resource_names": ["Alice", "Bob"],
+  "sections": [
+    {
+      "name": "Design",
+      "tasks": [
+        {
+          "name": "Research",
+          "time_estimate": 3,
+          "progress": 80,
+          "ranges": [
+            {"start": "2026-03-02", "end": "2026-03-06", "color": "0070C0"}
+          ],
+          "annotations": {"Alice": "R", "Bob": "S"}
+        }
+      ]
+    }
+  ]
+}
+```
+
+Turn it into a chart from the command line, with no Python code:
+
+```bash
+xlsx-gantt chart.json -o gantt.xlsx --theme ocean
+```
+
+…or load the same file from Python:
+
+```python
+from xlsx_gantt import GanttChart, GanttTheme
+
+chart = GanttChart.from_json("chart.json", style=GanttTheme.get("ocean"))
+chart.generate_excel("gantt.xlsx")
+```
+
+### From Python data
+
+You can also build the plan in Python as plain dicts. The JSON file above uses
+the same structure, with `datetime` objects in place of the date strings:
+
 ```python
 from datetime import datetime
 from xlsx_gantt import GanttChart, GanttTheme
@@ -143,22 +191,6 @@ xlsx_bytes = chart.generate_excel_bytes()
 print("Done!")
 ```
 
-### From a JSON file
-
-Keep the project plan in a JSON file instead of Python code and load it in
-one line:
-
-```python
-from xlsx_gantt import GanttChart, GanttTheme
-
-chart = GanttChart.from_json("chart.json", style=GanttTheme.get("ocean"))
-chart.generate_excel("gantt.xlsx")
-```
-
-The JSON mirrors the dict API, with dates as ISO strings — see
-[Command-Line Usage](#command-line-usage) for a full example file. The same
-file also works without any Python at all: `xlsx-gantt chart.json -o gantt.xlsx`.
-
 ---
 
 ## Command-Line Usage
@@ -167,45 +199,17 @@ Installing the package also installs an `xlsx-gantt` command that builds a
 chart from a JSON file — no Python required:
 
 ```bash
-xlsx-gantt chart.json -o gantt.xlsx --theme ocean [--logo logo.png]
+xlsx-gantt chart.json -o gantt.xlsx --theme ocean [--logo logo.png] [--week-start sunday]
 ```
 
-The JSON mirrors the dict API, with dates as ISO strings (`YYYY-MM-DD`):
+The input is a JSON file like the one in the [Quick Start](#quick-start).
 
-```json
-{
-  "project_name": "Website Redesign",
-  "start_date": "2026-03-02",
-  "end_date": "2026-04-12",
-  "resource_names": ["Alice", "Bob"],
-  "sections": [
-    {
-      "name": "Design",
-      "tasks": [
-        {
-          "name": "Research",
-          "time_estimate": 3,
-          "progress": 80,
-          "ranges": [
-            {"start": "2026-03-02", "end": "2026-03-06", "color": "0070C0"}
-          ],
-          "annotations": {"Alice": "R", "Bob": "S"}
-        }
-      ]
-    }
-  ]
-}
-```
-
-`--theme` accepts any name from the [Themes](#themes) table. Invalid input is
+`--theme` accepts any name from the [Themes](#themes) table, and
+`--week-start` any weekday name (default `monday`). Invalid input is
 reported on stderr with exit code 1.
 
 The CLI is a thin wrapper around `GanttChart.from_json()`, so the same JSON
-file can be loaded from Python too:
-
-```python
-chart = GanttChart.from_json("chart.json")
-```
+file can be loaded from Python too.
 
 ---
 
@@ -423,6 +427,7 @@ chart = GanttChart(sections=..., style=style, ...)
 | `total_row_bg` | `None` | Total row background (`None` → `header_bg`) |
 | `day_names` | `("Mon", …, "Sun")` | Day abbreviations for row 2 (Mon-first) — set your own for other locales |
 | `week_label_format` | `"Week {week}"` | Row-1 week band label; `{week}` and `{year}` placeholders |
+| `week_start` | `0` | First day of the week band: `0` = Monday … `6` = Sunday. Monday uses ISO week numbers; other days count the week containing 1 January as week 1 |
 | `logo_scale` | `0.7` | Logo size as a fraction of the A1:B2 area |
 | `font_name` | `"Calibri"` | Font used throughout the sheet |
 | `col_width_task` | `25.0` | Task column width (Excel units) |
@@ -460,7 +465,7 @@ comp = rotate_hue("1A5276", 180)
 - **Multiple bars per row** — paint several independent date ranges on a single task row, each with its own hex colour; any range where `start == end` renders as a milestone
 - **Solid progress DataBars** — gradient-free Excel 2010 DataBar conditional formatting, injected via `x14` extension XML post-processing
 - **Fine-grained styling** — every colour, font, column width, and row height is a `GanttStyle` field; section names merge vertically, headers freeze, and label columns get auto-filters
-- **Locale control** — `GanttStyle.day_names` and `week_label_format` (with `{week}`/`{year}` placeholders) replace the default English labels
+- **Locale control** — `GanttStyle.day_names` and `week_label_format` (with `{week}`/`{year}` placeholders) replace the default English labels, and `week_start=6` starts each week band on Sunday
 - **Production-safe error handling** — malformed sections, tasks, ranges, and annotations are silently skipped; no unhandled exceptions in live environments
 
 ---
@@ -493,7 +498,8 @@ xlsx-gantt/
 │   ├── test_malformed_input.py
 │   ├── test_new_features.py
 │   ├── test_readme_example.py
-│   └── test_v020.py
+│   ├── test_v020.py
+│   └── test_week_start.py
 ├── pyproject.toml
 ├── requirements.txt
 ├── requirements-dev.txt

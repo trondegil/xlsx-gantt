@@ -5,6 +5,24 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-10-22
+
+### Added
+- `GanttStyle.week_start` sets the first day of the week for the row-1
+  week bands (`0` = Monday … `6` = Sunday, as in `datetime.weekday()`).
+  Monday keeps ISO 8601 week numbers; any other start day counts the week
+  containing 1 January as week 1, so a week spanning New Year stays in
+  one band. Default `0`, so existing charts are unchanged.
+- `--week-start` CLI option taking a weekday name, e.g.
+  `xlsx-gantt plan.json --week-start sunday`.
+
+### Changed
+- README Quick Start leads with the JSON file and the one-line CLI
+  command; the full Python dict example follows it.
+- New `assets/social-preview.png` (1280×640) for the GitHub social card.
+
+---
+
 ## [0.2.3] - 2026-07-27
 
 ### Changed
