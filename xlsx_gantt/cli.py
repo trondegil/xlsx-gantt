@@ -5,8 +5,8 @@ Command-line interface: build a Gantt chart .xlsx from a JSON file.
 
 Usage::
 
-    xlsx-gantt input.json -o gantt.xlsx [--theme ocean] [--logo logo.png]
-                                        [--week-start sunday]
+    xlsx-gantt input.json -o gantt.xlsx [--theme ocean | --color 2E86C1]
+                                        [--logo logo.png] [--week-start sunday]
 
 The JSON schema is documented on :meth:`~xlsx_gantt.GanttChart.from_json`,
 which this CLI is a thin wrapper around.
@@ -25,6 +25,16 @@ _WEEKDAYS = ["monday", "tuesday", "wednesday", "thursday",
              "friday", "saturday", "sunday"]
 
 
+def _hex_color(value: str) -> str:
+    """argparse type: accept ``RRGGBB`` or ``#RRGGBB``, return ``RRGGBB``."""
+    hex6 = value.removeprefix("#")
+    if len(hex6) != 6 or any(c not in "0123456789abcdefABCDEF" for c in hex6):
+        raise argparse.ArgumentTypeError(
+            f"invalid colour {value!r} (expected 6 hex digits, e.g. 2E86C1)"
+        )
+    return hex6.upper()
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="xlsx-gantt",
@@ -35,9 +45,15 @@ def main(argv: list[str] | None = None) -> int:
         "-o", "--output", default="gantt.xlsx",
         help="output .xlsx path (default: gantt.xlsx)",
     )
-    parser.add_argument(
+    colours = parser.add_mutually_exclusive_group()
+    colours.add_argument(
         "--theme", choices=GanttTheme.list_themes(), default=None,
         help="named colour theme",
+    )
+    colours.add_argument(
+        "--color", type=_hex_color, default=None, metavar="RRGGBB",
+        help="build a theme from one hex colour, e.g. 2E86C1 (quote it if "
+             "you add a leading '#')",
     )
     parser.add_argument("--logo", default=None, help="path to a logo image")
     parser.add_argument(
@@ -46,7 +62,12 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
-    style = GanttTheme.get(args.theme) if args.theme else GanttStyle()
+    if args.theme:
+        style = GanttTheme.get(args.theme)
+    elif args.color:
+        style = GanttTheme.from_color(args.color)
+    else:
+        style = GanttStyle()
     style.week_start = _WEEKDAYS.index(args.week_start)
 
     try:
