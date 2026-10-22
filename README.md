@@ -8,7 +8,7 @@
 <p align="center">
   <a href="https://pypi.org/project/xlsx-gantt/"><img src="https://img.shields.io/pypi/v/xlsx-gantt?color=blue" alt="PyPI version"/></a>
   <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10%2B-blue?logo=python&logoColor=white" alt="Python 3.10+"/></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License"/></a>
+  <a href="https://github.com/trondegil/xlsx-gantt/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License"/></a>
   <a href="https://pypi.org/project/openpyxl/"><img src="https://img.shields.io/badge/openpyxl-%E2%89%A53.1-informational?logo=microsoft-excel&logoColor=white" alt="openpyxl ≥ 3.1"/></a>
   <a href="https://github.com/trondegil/xlsx-gantt"><img src="https://img.shields.io/badge/github-trondegil%2Fxlsx--gantt-181717?logo=github&logoColor=white" alt="GitHub repository"/></a>
 </p>
@@ -596,6 +596,9 @@ The test suite covers:
 - `patch_solid_databars` with both file paths and `BytesIO`
 - Malformed sections, tasks, ranges, and annotations
 - Edge-case chart configurations (empty date ranges, `None` fields, reversed dates, etc.)
+- The CLI and its options (`--theme`, `--color`, `--logo`, `--week-start`)
+- Week numbering for every week start, including weeks that span New Year
+- Every plan in `examples/`
 
 ---
 
@@ -642,7 +645,7 @@ Contributions are welcome! Here is the recommended workflow:
    git commit -m "feat: add X / fix Y"
    ```
 
-6. **Open a pull request** against the `main` branch describing what you changed and why.
+6. **Open a pull request** against the `master` branch describing what you changed and why.
 
 ### Reporting issues
 
@@ -655,7 +658,7 @@ Please open a GitHub Issue and include:
 
 ## License
 
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for the full text.
+This project is licensed under the **MIT License** — see the [LICENSE](https://github.com/trondegil/xlsx-gantt/blob/master/LICENSE) file for the full text.
 
 > **Dependency licences**
 > - [openpyxl](https://pypi.org/project/openpyxl/) — MIT

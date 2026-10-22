@@ -4,15 +4,16 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xlsx-gantt"
-version = "0.4.0"
-description = "Generate richly styled Gantt charts as Excel (.xlsx) files"
+version = "0.4.1"
+description = "Editable, presentation-ready Gantt charts as native Excel (.xlsx) files from Python or JSON, with a CLI"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [
     { name = "trondegil" },
 ]
-keywords = ["gantt", "excel", "xlsx", "openpyxl", "chart", "project-management"]
+keywords = ["gantt", "gantt-chart", "excel", "xlsx", "openpyxl", "chart", "cli", "json",
+            "project-management", "project-planning", "roadmap", "timeline"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -35,6 +36,8 @@ dependencies = [
 Homepage = "https://github.com/trondegil/xlsx-gantt"
 Repository = "https://github.com/trondegil/xlsx-gantt"
 "Bug Tracker" = "https://github.com/trondegil/xlsx-gantt/issues"
+Changelog = "https://github.com/trondegil/xlsx-gantt/blob/master/CHANGELOG.md"
+Examples = "https://github.com/trondegil/xlsx-gantt/tree/master/examples"
 
 [project.optional-dependencies]
 # Deprecated no-op alias — Pillow is now a default dependency.

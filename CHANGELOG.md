@@ -5,7 +5,7 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.4.1] - 2026-10-22
 
 ### Changed
 - Logos are bigger: `GanttStyle.logo_scale` now defaults to `1.0`, so the
@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `logo_scale=0.7` to get the old size.
 - The README example's logo is now a kringle, and the finished workbook
   is included as `examples/bakery-plan.xlsx`.
+- PyPI page: new summary and keywords, plus Changelog and Examples
+  links. The README's test-suite list covers the CLI, week numbering and
+  examples.
+
+### Fixed
+- README `LICENSE` links are absolute, so they work on PyPI.
+- Contributing guide named the wrong default branch (`main`, not `master`).
 
 ---
 
