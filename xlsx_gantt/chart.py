@@ -138,6 +138,12 @@ def _convert_range_dates(sections: list) -> list:
 # Week numbering
 # ══════════════════════════════════════════════════════════════════════
 
+def _col_range(col: int, first_row: int, last_row: int) -> str:
+    """Return an A1-style range for rows *first_row*–*last_row* of *col*, e.g. ``C4:C15``."""
+    letter = get_column_letter(col)
+    return f"{letter}{first_row}:{letter}{last_row}"
+
+
 def _week_of(d: date, week_start: int) -> tuple[int, int]:
     """
     Return ``(year, week)`` for *d*, with weeks starting on *week_start*
@@ -352,9 +358,10 @@ class GanttChart:
         self._write_column_label_row(ws, ctx, data_end_row)
         self._prefill_data_area(ws, ctx, data_end_row)
 
-        total_row, total_est, prog_vals = self._write_data_rows(ws, ctx)
+        total_row = self._write_data_rows(ws, ctx)
 
-        self._write_total_row(ws, ctx, total_row, total_est, prog_vals)
+        self._write_total_row(ws, ctx, total_row)
+        self._write_earned_rows(ws, ctx, total_row)
         prog_cf_range = self._add_conditional_formatting(ws, ctx, total_row)
         self._apply_borders(ws, ctx, total_row)
 
@@ -687,19 +694,14 @@ class GanttChart:
 
     def _write_data_rows(
         self, ws, ctx: _RenderCtx
-    ) -> tuple[int, float, list[float]]:
+    ) -> int:
         """
         Iterate over sections and tasks, writing each row to the sheet.
 
-        Returns
-        -------
-        tuple[int, float, list[float]]
-            ``(next_empty_row, total_time_estimate, progress_values)``
+        Returns the next empty row, where the Total row goes.
         """
         current_row  = 4
         data_row_idx = 0
-        total_est    = 0.0
-        prog_vals:      list[float]          = []
         section_ranges: list[tuple[int,int]] = []
 
         for section in self.sections:
@@ -734,21 +736,6 @@ class GanttChart:
                     data_row_idx=data_row_idx,
                 )
 
-                # Accumulate totals
-                est = task_data.get("time_estimate")
-                if est is not None:
-                    try:
-                        total_est += est
-                    except TypeError:
-                        pass
-
-                prog = task_data.get("progress")
-                if prog is not None:
-                    try:
-                        prog_vals.append(float(prog))
-                    except (TypeError, ValueError):
-                        pass
-
                 current_row  += 1
                 data_row_idx += 1
 
@@ -764,7 +751,7 @@ class GanttChart:
             mc.alignment = Alignment(horizontal="left", vertical="top",
                                      wrap_text=True)
 
-        return current_row, total_est, prog_vals
+        return current_row
 
     def _write_task_row(
         self,
@@ -877,10 +864,17 @@ class GanttChart:
         ws,
         ctx: _RenderCtx,
         total_row: int,
-        total_est: float,
-        prog_vals: list[float],
     ) -> None:
-        """Write the *Total* summary row below all data rows."""
+        """
+        Write the *Total* summary row below all data rows.
+
+        Both totals are live formulas, so they follow edits made in Excel:
+        the estimate is a ``SUM`` and the progress is weighted by time
+        estimate, so a 10-day task counts five times as much as a 2-day
+        one.  Tasks without a positive estimate carry no weight, and blank
+        progress counts as 0 %, matching the Earned / Remaining rows; if no
+        task has an estimate, the progress is a plain average.
+        """
         s = ctx.s
         ws.row_dimensions[total_row].height = s.row_height_total
 
@@ -901,15 +895,55 @@ class GanttChart:
         ws.cell(row=total_row, column=ctx.COL_TASK).font = total_font
 
         c = ws.cell(row=total_row, column=ctx.COL_EST)
-        c.value     = total_est
+        c.value     = 0
         c.font      = total_font
         c.alignment = ctx.center
 
-        if prog_vals:
-            c = ws.cell(row=total_row, column=ctx.COL_PROG)
-            c.value     = round(sum(prog_vals) / len(prog_vals), 1)
-            c.font      = total_font
-            c.alignment = ctx.center
+        c = ws.cell(row=total_row, column=ctx.COL_PROG)
+        c.font      = total_font
+        c.alignment = ctx.center
+
+        if total_row > 4:   # at least one data row
+            est  = _col_range(ctx.COL_EST,  4, total_row - 1)
+            prog = _col_range(ctx.COL_PROG, 4, total_row - 1)
+            ws.cell(row=total_row, column=ctx.COL_EST).value = f"=SUM({est})"
+            c.value = (
+                f'=IFERROR(ROUND(SUMPRODUCT({est},{prog})'
+                f'/SUMIF({est},">0"),1),'
+                f'IFERROR(ROUND(AVERAGE({prog}),1),""))'
+            )
+
+    def _write_earned_rows(self, ws, ctx: _RenderCtx, total_row: int) -> None:
+        """
+        Write *Earned* and *Remaining* below the Total row, after one blank
+        row: label, short description and a formula in the estimate column.
+
+        Earned is each task's time estimate × progress, summed; Remaining is
+        the Total estimate minus Earned.  Skipped when there are no tasks.
+        """
+        if total_row <= 4:
+            return
+        s    = ctx.s
+        est  = _col_range(ctx.COL_EST,  4, total_row - 1)
+        prog = _col_range(ctx.COL_PROG, 4, total_row - 1)
+        est_col     = get_column_letter(ctx.COL_EST)
+        earned_row  = total_row + 2
+        rows = [
+            (earned_row,     s.earned_label,    s.earned_note,
+             f"=ROUND(SUMPRODUCT({est},{prog})/100,1)"),
+            (earned_row + 1, s.remaining_label, s.remaining_note,
+             f"={est_col}{total_row}-{est_col}{earned_row}"),
+        ]
+        for row, label, note, formula in rows:
+            for col, value, align in ((ctx.COL_ACT,  label,   ctx.left),
+                                      (ctx.COL_TASK, note,    ctx.left),
+                                      (ctx.COL_EST,  formula, ctx.center)):
+                c = ws.cell(row=row, column=col)
+                c.value     = value
+                c.font      = Font(name=s.font_name, color=s.summary_fg,
+                                   size=s.font_size_body,
+                                   italic=(col == ctx.COL_TASK))
+                c.alignment = align
 
     # ══════════════════════════════════════════════════════════════════
     # Conditional formatting

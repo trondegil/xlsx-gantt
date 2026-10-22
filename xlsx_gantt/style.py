@@ -80,6 +80,13 @@ class GanttStyle:
     total_row_bg: str | None = None     # total-row background (→ header_bg)
     total_row_fg: str | None = None     # total-row text colour  (→ header_fg)
 
+    # ── Earned / remaining rows (below the Total row) ────────────────
+    summary_fg:      str = "FFFFFF"   # text colour; white hides the rows on the white sheet
+    earned_label:    str = "Earned hours"
+    earned_note:     str = "Time estimate × progress, summed"
+    remaining_label: str = "Remaining hours"
+    remaining_note:  str = "Total time estimate − earned"
+
     # ── Annotation (R/S role) cells ───────────────────────────────────
     annotation_r_fg:  str        = "000000" # "R: Responsible" text
     annotation_s_fg:  str        = "000000" # "S: Support" text

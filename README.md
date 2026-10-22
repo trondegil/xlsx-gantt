@@ -37,7 +37,7 @@
 - **Polished charts out of the box** — pick one of eight ready-made colour themes, or generate a matching palette from your brand colour
 - **No Excel needed to create them** — charts are plain `.xlsx` files anyone can open, filter, and edit in Excel
 - **Simple to use** — describe your project as sections and tasks, get a presentation-ready chart; even directly from the command line: `xlsx-gantt chart.json -o gantt.xlsx`
-- **Shows what matters** — progress bars per task, milestones, who's responsible for what, and automatic time-estimate totals
+- **Shows what matters** — progress bars per task, milestones, who's responsible for what, and a Total row whose estimate and effort-weighted progress update as you edit
 - **Your language, your logo** — day and week labels are fully configurable, and your logo can sit in the chart header
 - **A natural fit for AI-assisted planning** — the whole plan is plain dicts or a JSON file, so an LLM or coding agent can draft it, revise it, and regenerate the chart in one step; describe the project in prose, let the model produce the JSON, and run `xlsx-gantt plan.json -o gantt.xlsx` ([example](#ai-assisted-planning))
 - **Lightweight** — just [openpyxl](https://openpyxl.readthedocs.io/) and [Pillow](https://pypi.org/project/Pillow/); no pandas, no matplotlib, no Java bridge
@@ -336,7 +336,8 @@ print(GanttTheme.list_themes())
 {
     "name": str,                      # task label
     "time_estimate": float | None,    # hours / days / any unit; summed in the Total row
-    "progress": float | None,         # 0–100 %; rendered as a solid DataBar
+    "progress": float | None,         # 0–100 %; rendered as a solid DataBar, weighted by
+                                      # time_estimate in the Total row
     "ranges": [                       # one or more coloured bars on the timeline
         {
             "start": datetime,        # inclusive start date
@@ -354,6 +355,27 @@ print(GanttTheme.list_themes())
 
 > **Note:** `time_estimate`, `progress`, `ranges`, and `annotations` are all optional.
 > Omitting them or passing `None` is handled gracefully.
+
+The **Total** row holds live Excel formulas, so it stays correct when you edit
+the workbook. The estimate is a `SUM`. The progress is weighted by time estimate:
+a 10-day task at 0 % and a 2-day task at 100 % give 16.7 %, not 50 %:
+
+```
+=IFERROR(ROUND(SUMPRODUCT(C4:C15,D4:D15)/SUMIF(C4:C15,">0"),1),
+         IFERROR(ROUND(AVERAGE(D4:D15),1),""))
+```
+
+Tasks without a positive estimate carry no weight, so milestones are left out.
+Blank progress counts as 0 %. If no task has an estimate, the progress is a plain
+average.
+
+Below the Total row, after one blank row, two optional rows show **Earned hours**
+(each task's estimate × progress, summed) and **Remaining hours** (Total estimate
+minus Earned). Each row has a short description, and both are formulas too. The text
+is white, so the rows stay hidden on the white sheet until you give them a colour:
+change the font colour in Excel, or set the `summary_fg` style field (for example
+`"696969"` for dim gray). If your estimates are in days, rename the rows with the
+`earned_label` and `remaining_label` style fields.
 
 ---
 
@@ -492,6 +514,9 @@ chart = GanttChart(sections=..., style=style, ...)
 | `annotation_r_bg` | `None` | Background for "R" annotation cells (`annotation_a_bg` still accepted) |
 | `annotation_s_bg` | `None` | Background for "S" annotation cells |
 | `total_row_bg` | `None` | Total row background (`None` → `header_bg`) |
+| `summary_fg` | `"FFFFFF"` | Text colour of the Earned / Remaining rows (white = hidden; e.g. `"696969"` for dim gray) |
+| `earned_label` / `remaining_label` | `"Earned hours"` / `"Remaining hours"` | Labels for the rows below the Total row |
+| `earned_note` / `remaining_note` | `"Time estimate × progress, summed"` / `"Total time estimate − earned"` | Their short descriptions |
 | `day_names` | `("Mon", …, "Sun")` | Day abbreviations for row 2 (Mon-first) — set your own for other locales |
 | `week_label_format` | `"Week {week}"` | Row-1 week band label; `{week}` and `{year}` placeholders |
 | `week_start` | `0` | First day of the week band: `0` = Monday … `6` = Sunday. Monday uses ISO week numbers; other days count the week containing 1 January as week 1 |
@@ -571,6 +596,7 @@ xlsx-gantt/
 │   ├── test_readme_example.py
 │   ├── test_cli_color.py
 │   ├── test_examples.py
+│   ├── test_total_progress.py
 │   ├── test_v020.py
 │   └── test_week_start.py
 ├── pyproject.toml
@@ -599,6 +625,7 @@ The test suite covers:
 - The CLI and its options (`--theme`, `--color`, `--logo`, `--week-start`)
 - Week numbering for every week start, including weeks that span New Year
 - Every plan in `examples/`
+- The Total, Earned and Remaining formulas, recalculated by LibreOffice when it is installed
 
 ---
 

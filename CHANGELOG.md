@@ -5,6 +5,30 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.2] - 2026-10-22
+
+### Added
+- Optional **Earned hours** and **Remaining hours** rows below the Total
+  row, each with a short description. Earned is each task's time
+  estimate × progress, summed. Remaining is the Total estimate minus
+  Earned. Both are Excel formulas. The text is white, so the rows stay
+  hidden until given a colour in Excel or through the new `summary_fg`
+  field (e.g. `"696969"`). The labels and descriptions are configurable
+  through `earned_label`, `earned_note`, `remaining_label` and
+  `remaining_note`.
+
+### Fixed
+- The Total row's progress is now weighted by each task's
+  `time_estimate`. Before, it was a plain average, so a 2-day task
+  counted as much as a 10-day one. Tasks without a positive estimate
+  carry no weight, and blank progress counts as 0 %. If no task has an
+  estimate, it falls back to the plain average.
+
+### Changed
+- The Total row's estimate and progress are now Excel formulas
+  (`SUM` and `SUMPRODUCT`/`SUMIF`) instead of fixed values, so they
+  update when the workbook is edited.
+
 ## [0.4.1] - 2026-10-22
 
 ### Changed
