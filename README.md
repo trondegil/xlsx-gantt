@@ -199,14 +199,22 @@ Installing the package also installs an `xlsx-gantt` command that builds a
 chart from a JSON file — no Python required:
 
 ```bash
-xlsx-gantt chart.json -o gantt.xlsx --theme ocean [--logo logo.png] [--week-start sunday]
+xlsx-gantt chart.json -o gantt.xlsx [--theme ocean | --color 2E86C1] [--logo logo.png] [--week-start sunday]
 ```
 
 The input is a JSON file like the one in the [Quick Start](#quick-start).
 
-`--theme` accepts any name from the [Themes](#themes) table, and
-`--week-start` any weekday name (default `monday`). Invalid input is
-reported on stderr with exit code 1.
+| Option | What it does |
+|--------|--------------|
+| `-o`, `--output` | Output `.xlsx` path (default `gantt.xlsx`) |
+| `--theme NAME` | One of the [built-in themes](#themes) |
+| `--color RRGGBB` | Build a theme from your own colour, like `GanttTheme.from_color()`; can't be combined with `--theme` |
+| `--logo PATH` | Logo image for the top-left corner (PNG, JPEG, BMP, GIF, TIFF) |
+| `--week-start DAY` | First day of the week for the week bands (default `monday`) |
+
+Bar colours are set per range in the JSON (`"color": "RRGGBB"`); bars
+without one use the theme's bar colour. Invalid input is reported on stderr
+with exit code 1.
 
 The CLI is a thin wrapper around `GanttChart.from_json()`, so the same JSON
 file can be loaded from Python too.
@@ -243,21 +251,30 @@ design is about half finished.
 ```
 
 **The result:** Claude replied with
-[this plan](https://github.com/trondegil/xlsx-gantt/blob/master/examples/bakery-plan.json),
-and one command turns it into a chart:
+[this plan](https://github.com/trondegil/xlsx-gantt/blob/master/examples/bakery-plan.json).
+One command turns it into a chart, here with the bakery's
+[logo](https://github.com/trondegil/xlsx-gantt/blob/master/examples/bakery-logo.png)
+and brand colour:
 
 ```bash
-xlsx-gantt plan.json -o bakery.xlsx --theme ocean
+xlsx-gantt plan.json -o bakery.xlsx --color A0522D --logo bakery-logo.png
 ```
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/ai-planning-example.png" alt="Gantt chart for the bakery online-ordering project, generated from the AI-written plan" width="100%"/>
+  <img src="https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/ai-planning-example.png" alt="Gantt chart for the bakery online-ordering project in the bakery's brown brand colour, with its bread logo in the corner" width="100%"/>
 </p>
 
 To change the plan, keep the conversation going ("move user testing a week
 later and add a security review"), save the new JSON, and run the command
 again. Coding agents such as Claude Code can edit `plan.json` and run the CLI
 themselves.
+
+Both files are in the repository, so from a clone you can rebuild this exact
+chart:
+
+```bash
+xlsx-gantt examples/bakery-plan.json -o bakery.xlsx --color A0522D --logo examples/bakery-logo.png
+```
 
 ---
 
@@ -542,12 +559,14 @@ xlsx-gantt/
 │   ├── py.typed               # PEP 561 marker
 │   └── _xlsx_patch.py         # Internal: solid DataBar XML post-processor
 ├── examples/
+│   ├── bakery-logo.png        # Logo used in the README example
 │   └── bakery-plan.json       # AI-written plan from the README
 ├── tests/
 │   ├── __init__.py
 │   ├── test_malformed_input.py
 │   ├── test_new_features.py
 │   ├── test_readme_example.py
+│   ├── test_cli_color.py
 │   ├── test_examples.py
 │   ├── test_v020.py
 │   └── test_week_start.py
