@@ -135,6 +135,30 @@ def _convert_range_dates(sections: list) -> list:
 
 
 # ══════════════════════════════════════════════════════════════════════
+# Week numbering
+# ══════════════════════════════════════════════════════════════════════
+
+def _week_of(d: date, week_start: int) -> tuple[int, int]:
+    """
+    Return ``(year, week)`` for *d*, with weeks starting on *week_start*
+    (0 = Monday … 6 = Sunday).
+
+    Monday-start weeks use ISO 8601 numbering.  For any other start day,
+    week 1 is the week containing 1 January, so a week spanning New Year
+    belongs entirely to the new year.
+    """
+    d = date(d.year, d.month, d.day)   # accept datetime too
+    if week_start == 0:
+        iso = d.isocalendar()
+        return iso[0], iso[1]
+    first = d - timedelta(days=(d.weekday() - week_start) % 7)
+    year  = (first + timedelta(days=6)).year
+    jan1  = date(year, 1, 1)
+    week1 = jan1 - timedelta(days=(jan1.weekday() - week_start) % 7)
+    return year, (first - week1).days // 7 + 1
+
+
+# ══════════════════════════════════════════════════════════════════════
 # GanttChart
 # ══════════════════════════════════════════════════════════════════════
 
@@ -571,7 +595,7 @@ class GanttChart:
         """Merge and label week bands in row 1 across the date columns."""
         week_groups: OrderedDict = OrderedDict()
         for i, d in enumerate(self.dates):
-            key = d.isocalendar()[:2]
+            key = _week_of(d, ctx.s.week_start)
             if key not in week_groups:
                 week_groups[key] = [ctx.DATE_COL0 + i, ctx.DATE_COL0 + i, key[1]]
             else:

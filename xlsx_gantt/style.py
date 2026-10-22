@@ -101,6 +101,11 @@ class GanttStyle:
         "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun",
     )
     week_label_format: str = "Week {week}"  # row-1 band label; {week} and {year} available
+    # First day of the week for the row-1 week bands: 0 = Monday … 6 = Sunday
+    # (same numbering as datetime.weekday()). Monday uses ISO 8601 week
+    # numbers; any other start day counts the week containing 1 January as
+    # week 1 (the US / Outlook convention for week_start=6).
+    week_start: int = 0
 
     # ── Font ──────────────────────────────────────────────────────────
     font_name:        str   = "Calibri"
@@ -127,6 +132,13 @@ class GanttStyle:
     row_height_total: float = 16.0  # Total row
 
     def __post_init__(self) -> None:
+        if (isinstance(self.week_start, bool)
+                or not isinstance(self.week_start, int)
+                or not 0 <= self.week_start <= 6):
+            raise ValueError(
+                f"week_start must be an int from 0 (Monday) to 6 (Sunday), "
+                f"got {self.week_start!r}"
+            )
         # Honour the deprecated annotation_a_* names when given.
         if self.annotation_a_fg is not None:
             self.annotation_r_fg = self.annotation_a_fg

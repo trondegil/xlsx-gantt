@@ -6,6 +6,7 @@ Command-line interface: build a Gantt chart .xlsx from a JSON file.
 Usage::
 
     xlsx-gantt input.json -o gantt.xlsx [--theme ocean] [--logo logo.png]
+                                        [--week-start sunday]
 
 The JSON schema is documented on :meth:`~xlsx_gantt.GanttChart.from_json`,
 which this CLI is a thin wrapper around.
@@ -16,7 +17,12 @@ import argparse
 import sys
 
 from .chart import GanttChart
+from .style import GanttStyle
 from .themes import GanttTheme
+
+# Indexed like datetime.weekday() / GanttStyle.week_start.
+_WEEKDAYS = ["monday", "tuesday", "wednesday", "thursday",
+             "friday", "saturday", "sunday"]
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -34,12 +40,19 @@ def main(argv: list[str] | None = None) -> int:
         help="named colour theme",
     )
     parser.add_argument("--logo", default=None, help="path to a logo image")
+    parser.add_argument(
+        "--week-start", choices=_WEEKDAYS, default="monday",
+        help="first day of the week for the week bands (default: monday)",
+    )
     args = parser.parse_args(argv)
+
+    style = GanttTheme.get(args.theme) if args.theme else GanttStyle()
+    style.week_start = _WEEKDAYS.index(args.week_start)
 
     try:
         chart = GanttChart.from_json(
             args.input,
-            style     = GanttTheme.get(args.theme) if args.theme else None,
+            style     = style,
             logo_path = args.logo,
         )
     except OSError as err:
