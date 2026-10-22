@@ -1,0 +1,117 @@
+{
+  "project_name": "Bakery Online Ordering",
+  "start_date": "2026-04-13",
+  "end_date": "2026-05-24",
+  "resource_names": ["Maya", "Leo", "Priya"],
+  "sections": [
+    {
+      "name": "Discovery",
+      "tasks": [
+        {
+          "name": "Stakeholder interviews",
+          "time_estimate": 2,
+          "progress": 100,
+          "ranges": [{"start": "2026-04-13", "end": "2026-04-14", "color": "2F6FE4"}],
+          "annotations": {"Priya": "R", "Maya": "S"}
+        },
+        {
+          "name": "Requirements & menu data",
+          "time_estimate": 3,
+          "progress": 100,
+          "ranges": [{"start": "2026-04-14", "end": "2026-04-16", "color": "2F6FE4"}],
+          "annotations": {"Leo": "R", "Priya": "S"}
+        }
+      ]
+    },
+    {
+      "name": "Design",
+      "tasks": [
+        {
+          "name": "Wireframes",
+          "time_estimate": 4,
+          "progress": 100,
+          "ranges": [{"start": "2026-04-16", "end": "2026-04-21", "color": "8E44AD"}],
+          "annotations": {"Maya": "R", "Leo": "S"}
+        },
+        {
+          "name": "Visual design",
+          "time_estimate": 6,
+          "progress": 50,
+          "ranges": [{"start": "2026-04-21", "end": "2026-04-28", "color": "8E44AD"}],
+          "annotations": {"Maya": "R", "Priya": "S"}
+        },
+        {
+          "name": "Design sign-off",
+          "time_estimate": null,
+          "progress": null,
+          "ranges": [{"start": "2026-04-29", "end": "2026-04-29", "color": "C0392B"}],
+          "annotations": {"Maya": "R"}
+        }
+      ]
+    },
+    {
+      "name": "Build",
+      "tasks": [
+        {
+          "name": "Ordering & checkout",
+          "time_estimate": 10,
+          "progress": 0,
+          "ranges": [{"start": "2026-04-27", "end": "2026-05-08", "color": "16A06B"}],
+          "annotations": {"Leo": "R", "Maya": "S"}
+        },
+        {
+          "name": "Payments integration",
+          "time_estimate": 7,
+          "progress": 0,
+          "ranges": [{"start": "2026-05-04", "end": "2026-05-12", "color": "16A06B"}],
+          "annotations": {"Leo": "R"}
+        },
+        {
+          "name": "Content & photos",
+          "time_estimate": 6,
+          "progress": 0,
+          "ranges": [{"start": "2026-04-29", "end": "2026-05-06", "color": "16A06B"}],
+          "annotations": {"Priya": "R", "Maya": "S"}
+        }
+      ]
+    },
+    {
+      "name": "Testing",
+      "tasks": [
+        {
+          "name": "User testing in two shops",
+          "time_estimate": 3,
+          "progress": 0,
+          "ranges": [{"start": "2026-05-13", "end": "2026-05-15", "color": "F08C1A"}],
+          "annotations": {"Maya": "R", "Priya": "S"}
+        },
+        {
+          "name": "Bug fixes",
+          "time_estimate": 4,
+          "progress": 0,
+          "ranges": [{"start": "2026-05-14", "end": "2026-05-19", "color": "F08C1A"}],
+          "annotations": {"Leo": "R"}
+        }
+      ]
+    },
+    {
+      "name": "Launch",
+      "tasks": [
+        {
+          "name": "Launch campaign",
+          "time_estimate": 5,
+          "progress": 0,
+          "ranges": [{"start": "2026-05-11", "end": "2026-05-22", "color": "D64545"}],
+          "annotations": {"Priya": "R", "Maya": "S"}
+        },
+        {
+          "name": "Go live",
+          "time_estimate": null,
+          "progress": null,
+          "ranges": [{"start": "2026-05-22", "end": "2026-05-22", "color": "C0392B"}],
+          "annotations": {"Leo": "R", "Priya": "S"}
+        }
+      ]
+    }
+  ]
+}

@@ -26,7 +26,7 @@
 
 ## Contents
 
-**Getting started:** [Features](#features) · [Installation](#installation) · [Quick Start](#quick-start) · [Command-Line Usage](#command-line-usage) · [Themes](#themes) · [Data Structure](#data-structure)
+**Getting started:** [Features](#features) · [Installation](#installation) · [Quick Start](#quick-start) · [Command-Line Usage](#command-line-usage) · [AI-Assisted Planning](#ai-assisted-planning) · [Themes](#themes) · [Data Structure](#data-structure)
 
 **Going further:** [Advanced Usage](#advanced-usage) · [Development](#development) · [Requirements](#requirements) · [Contributing](#contributing) · [License](#license)
 
@@ -39,7 +39,7 @@
 - **Simple to use** — describe your project as sections and tasks, get a presentation-ready chart; even directly from the command line: `xlsx-gantt chart.json -o gantt.xlsx`
 - **Shows what matters** — progress bars per task, milestones, who's responsible for what, and automatic time-estimate totals
 - **Your language, your logo** — day and week labels are fully configurable, and your logo can sit in the chart header
-- **A natural fit for AI-assisted planning** — the whole plan is plain dicts or a JSON file, so an LLM or coding agent can draft it, revise it, and regenerate the chart in one step; describe the project in prose, let the model produce the JSON, and run `xlsx-gantt plan.json -o gantt.xlsx`
+- **A natural fit for AI-assisted planning** — the whole plan is plain dicts or a JSON file, so an LLM or coding agent can draft it, revise it, and regenerate the chart in one step; describe the project in prose, let the model produce the JSON, and run `xlsx-gantt plan.json -o gantt.xlsx` ([example](#ai-assisted-planning))
 - **Lightweight** — just [openpyxl](https://openpyxl.readthedocs.io/) and [Pillow](https://pypi.org/project/Pillow/); no pandas, no matplotlib, no Java bridge
 
 ---
@@ -210,6 +210,54 @@ reported on stderr with exit code 1.
 
 The CLI is a thin wrapper around `GanttChart.from_json()`, so the same JSON
 file can be loaded from Python too.
+
+---
+
+## AI-Assisted Planning
+
+The plan is plain JSON, so an AI assistant can write it for you. Describe the
+project in your own words, save the reply as `plan.json`, and run the CLI.
+
+**The prompt** (works in any chat assistant or coding agent):
+
+```text
+Create a project plan as JSON for the xlsx-gantt tool. Use this structure:
+
+{"project_name": str, "start_date": "YYYY-MM-DD", "end_date": "YYYY-MM-DD",
+ "resource_names": [str],
+ "sections": [{"name": str, "tasks": [{
+   "name": str, "time_estimate": working days or null, "progress": 0-100 or null,
+   "ranges": [{"start": "YYYY-MM-DD", "end": "YYYY-MM-DD", "color": "RRGGBB"}],
+   "annotations": {resource name: "R" (responsible) or "S" (support)}}]}]}
+
+Dates are inclusive. A range where start equals end is a milestone; give
+milestones null estimate and progress. Use one colour per section, and start
+and end tasks on weekdays. Reply with the JSON only.
+
+The project: we're building online ordering for a small bakery chain. The
+team is Maya (design), Leo (development) and Priya (marketing). We started
+Monday 13 April 2026 and go live Friday 22 May 2026. Cover discovery,
+design, build, testing and launch, with milestones for design sign-off and
+go-live. We're two weeks in: discovery and wireframes are done, and visual
+design is about half finished.
+```
+
+**The result:** Claude replied with
+[this plan](https://github.com/trondegil/xlsx-gantt/blob/master/examples/bakery-plan.json),
+and one command turns it into a chart:
+
+```bash
+xlsx-gantt plan.json -o bakery.xlsx --theme ocean
+```
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/trondegil/xlsx-gantt/master/assets/ai-planning-example.png" alt="Gantt chart for the bakery online-ordering project, generated from the AI-written plan" width="100%"/>
+</p>
+
+To change the plan, keep the conversation going ("move user testing a week
+later and add a security review"), save the new JSON, and run the command
+again. Coding agents such as Claude Code can edit `plan.json` and run the CLI
+themselves.
 
 ---
 
@@ -493,11 +541,14 @@ xlsx-gantt/
 │   ├── cli.py                 # xlsx-gantt command-line interface
 │   ├── py.typed               # PEP 561 marker
 │   └── _xlsx_patch.py         # Internal: solid DataBar XML post-processor
+├── examples/
+│   └── bakery-plan.json       # AI-written plan from the README
 ├── tests/
 │   ├── __init__.py
 │   ├── test_malformed_input.py
 │   ├── test_new_features.py
 │   ├── test_readme_example.py
+│   ├── test_examples.py
 │   ├── test_v020.py
 │   └── test_week_start.py
 ├── pyproject.toml
